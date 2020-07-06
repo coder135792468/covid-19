@@ -1,0 +1,188 @@
+
+<!DOCTYPE html>
+<html>
+    <head> 
+    <style>
+        body {background:#efefef;}
+#root{position:absolute;top:0;left:0;background:#ececec;width:100%;height:100%;overflow:hidden;}
+.loader{position:absolute;top:40%;left:40%;transform:translate (-50%, -50%);width:70px;display:flex;}
+.loader span{
+width:10px;height:60px;background:#fff;margin:0px 1px;animation:loading 800ms ease-in-out infinite;
+}
+.loader span:nth-child(1){background:#2eeca8;animation-delay:-700ms;}
+.loader span:nth-child(2){background:#eade3d;animation-delay:-600ms;}
+.loader span:nth-child(3){background:#55acee;animation-delay:-500ms;}
+.loader span:nth-child(4){background:#2eeca8;animation-delay:-400ms;}
+.loader span:nth-child(5){background:#09b7bf;animation-delay:-300ms;}
+.loader span:nth-child(6){background:#ea3d8c;animation-delay:-200ms;}
+.loader span:nth-child(7){background:orange;animation-delay:-100ms;}
+@keyframes loading{
+    0%, 60%, 100%{transform:scaleY(0.01);}
+    35%{transform:scale(1);}
+    }
+.header{
+  position:absolute;top:0;left:0;width:100%;
+   height:50px;background:#4488ff;
+}
+.mainPage{
+position:absolute;top:50px;left:0px;width:100%;height:calc(100% - 100px);overflow:scroll;
+}
+.footer{
+position:absolute;bottom:0;left:0;width:100%;
+height:50px;background:#4488ff;display:flex;
+justify-content:space-around;align-items:center;
+}
+.footer .minibox{color:#fff;margin:0;text-align:center;}
+.footer .minibox p b{font-size:1.2em;}
+.footer .minibox p span{font-size:0.9em;}
+
+.header div{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+padding:0 5%;outline:none;width:100%;
+}
+.searchBar{
+ width:calc(100% - 80px);height:25px;margin-left:3px;padding:4px;outline:none;
+}
+.header button{
+ width:50px;height:35px;margin-left:5px;padding:5px;outline:none;background:#fff;
+border:none;
+}
+.covid-card{
+background:#fff;padding:5px 0px;margin:10px 0;box-shadow:0px 2px 2px rgba(0,0,0,0.1);
+position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:100%;
+}
+.covid-card .info:nth-child(2){
+display:flex;justify-content:space-around;align-items:center;text-align:center;margin:0;  
+}
+.covid-card .info h2{text-align:center;}
+.covid-card .minibox p b{font-size:1.2em;color:grey;}
+.covid-card .minibox p span{font-size:0.9em;}
+
+
+    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <div class="loader">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            </div>
+        <title>Page Title</title>
+    </head>
+    <body>
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+     <script src="https://unpkg.com/babel-standalone@6.26.0/babel.min.js"></script>
+        <script crossorigin src="https://unpkg.com/react@16/umd/react.production.min.js"></script> 
+        <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/prop-types/15.7.2/prop-types.min.js"></script> 
+
+        <div id="root"></div>
+        <script type="text/babel">
+           async function apiCall(url){
+    const call = await fetch(url);
+    const dataBack = await call.json();
+    return dataBack;
+}
+const {useState,useEffect} = React;
+const Header=(props)=>{
+const [txt,setTxt]=useState("");
+const searchData =(e)=>{
+    props.searchInfo(txt);
+    setTxt("");
+}
+const changeData =(e)=>setTxt(e.target.value);
+    return(
+       <div className = "header">
+       <div>
+       <input type="text" className="searchBar" value={txt} placeholder="Search a country...." onChange={changeData}/>
+       <button onClick={searchData}><span className="fa fa-search"></span></button>
+       </div>
+       </div> 
+    );
+}
+const Main=({country,confirmed,death,recovered})=>{
+    return(
+      <div className="mainPage">      
+     <div className="covid-card">
+          <div className="info"><h2>{country}</h2></div>
+          <div className="info">           
+            <div className="minibox">
+       <p><b>Confirmed</b><br/><span>{confirmed}</span></p>
+       </div>       
+       <div className="minibox">
+       <p><b>Death</b><br/><span>{death}</span></p>
+       </div>       
+      <div className="minibox">
+       <p><b>Recovered</b><br/><span>{recovered}</span></p>
+       </div>              
+          </div>
+        </div>
+      </div>  
+    );
+}
+const Footer =({confirmed,death,recover})=>{
+    return(
+       <div className="footer">
+       <div className="minibox">
+       <p><b>Confirmed</b><br/><span>{confirmed}</span></p>
+       </div>       
+       <div className="minibox">
+       <p><b>Death</b><br/><span>{death}</span></p>
+       </div>       
+       <div className="minibox">
+       <p><b>Recovered</b><br/><span>{recover}</span></p>
+       </div>       
+       </div>
+    );
+}
+const App =()=>{
+const [gconfirmed,setgconfirmed] = useState("Loading..");
+const [gdeath,setgdeath] = useState("Loading..");
+const [grecovered,setgrecovered] = useState("Loading..");
+const [cntrydata,setCountryData] = useState("World");
+const [death,setDeath]= useState("Loading..");
+const [recover,setRecover]= useState("Loading..");
+const [confirm,setConfirm] = useState("Loading..");
+useEffect(()=>{
+apiCall("https://covid19.mathdro.id/api").then(res=>{
+     setgconfirmed(res.confirmed.value);
+     setgrecovered(res.recovered.value);
+     setgdeath(res.deaths.value);         
+     setDeath(res.deaths.value); 
+     setRecover(res.recovered.value);  
+     setConfirm(res.confirmed.value);        
+  }).catch(err=>{
+     console.log("Somethings Wents Wrong");
+  });
+  
+},[]);
+const searchInfo=(e)=>{
+apiCall(`https://covid19.mathdro.id/api/countries/${e}`).then(res=>{   
+     setCountryData(e);
+     setDeath(res.deaths.value); 
+     setRecover(res.recovered.value);  
+     setConfirm(res.confirmed.value);        
+  }).catch(err=>{
+     alert("Country not Found!!!");
+  });    
+}
+ return(
+   <div>
+   <Header searchInfo={searchInfo} />
+   <Main 
+   country={cntrydata} confirmed={confirm} death={death} recovered={recover} />
+   <Footer confirmed={gconfirmed} death={gdeath} recover={grecovered} />
+   </div>  
+ ); 
+};
+document.getElementsByClassName("loader")[0].style.display = "none";
+ReactDOM.render(
+    <App />,
+    document.getElementById("root")
+) 
+        </script>
+    </body>
+</html>
